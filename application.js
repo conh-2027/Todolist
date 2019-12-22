@@ -85,6 +85,24 @@ function addEventsDragAndDrop(el) {
     console.log(event);
   });
 }
+
+let editTask = function() {
+  console.log("editTask")
+  let listItem = this.parentNode;
+  let editInput = listItem.querySelector('input[type=text]');
+  let containsClass = listItem.classList.contains("editMode");
+  if (containsClass) {
+
+  } else {
+    editInput.value = label.innerText
+  }
+}
+
+function addEditTask(el) {
+  el.addEventListener('click', function(event){
+    editTask();
+  });
+}
 /*
 
 */
@@ -96,15 +114,19 @@ function addNewItem() {
     let attr = document.createAttribute('draggable');
     let ul = document.querySelector('ul');
     let editInput = document.createElement("input");
-    let editButton = document.createElement("button");
-    let deleteButton = document.createElement("button");
+    let editButton = document.createElement("span");
+    let deleteButton = document.createElement("span");
 
     editInput.type = "text";
     editButton.innerText = "Edit";
     editButton.className = "edit";
     deleteButton.innerText = "Delete";
     deleteButton.className = "delete";
-    listTasks.appendChild(li)
+
+    li.appendChild(editInput);
+    li.appendChild(editButton);
+    li.appendChild(deleteButton)
+
     li.className = 'draggable';
     attr.value = 'true';
     li.setAttributeNode(attr);
@@ -112,6 +134,9 @@ function addNewItem() {
     li.appendChild(document.createTextNode(newItem));
     ul.appendChild(li);
     addEventsDragAndDrop(li);
+
+    addEditTask(editButton);
+    li.onclick = editTask();
     localStorage.setItem('id', JSON.stringify(listTasks))
     console.log(listTasks);
   }

@@ -80,7 +80,7 @@ body ul .draggable {
 }
 
 body ul .draggable:after {
-  content: 'drag me';
+  /* content: 'drag me'; */
   right: 7px;
   font-size: 10px;
   position: absolute;
@@ -99,4 +99,9 @@ body ul .draggable:hover:after {
 
 .over {
   transform: scale(1.1, 1.1);
+}
+.edit, .delete {
+  display: inline-block;
+  margin-left: 10px;
+  float: right;
 }
