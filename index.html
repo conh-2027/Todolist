@@ -1,37 +1,32 @@
 <html>
   <head>
-      <link rel="stylesheet" href="style.css" type="text/css" media="screen" char0set="utf-8">
-      <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="style.css" type="text/css" media="screen" char0set="utf-8">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
   </head>
   <body>
-      <section class="list">
-          <header>To Do</header>
-          <article class="card">
-            <header>Drag and Drop CSS</header>
-            <div class="detail">1/2</div>
-          </article>
-          <article class="card">
-            <header>Maybe something else ?</header>
-            <div class="detail">1/2</div>
-          </article>
-        </section>
-        <section class="list">
-          <header>Doing</header>
-          <article class="card">
-            <header>Drag and Drop JS</header>
-            <div class="detail">1/2</div>
-          </article>
-        </section>
-        <section class="list">
-          <header>Done</header>
-          <article class="card">
-            <header>Global HTML</header>
-            <div class="detail">1/2</div>
-          </article>
-          <article class="card">
-            <header>Global CSS</header>
-            <div class="detail">1/2</div>
-          </article>
-        </section>
+    <h1>DRAG AND DROP HTML5</h1>
+    <div class="row">
+      <div class="col-md-6" >
+        <div class="adder">
+          <input type="text" class="input" placeholder="Add items in your list"/>
+          <span class="add">+</span>
+        </div>
+        <ul id="todo" ondrop="drop(event)" ondragover="allowDrop(event)">
+          <li class="draggable" draggable="true" id="card1" ondragstart="drag(event)">Javascript</li>
+          <li class="draggable" draggable="true" id="card3" ondragstart="drag(event)">Javascript1</li>
+        </ul>
+      </div>
+
+      <div class="col-md-6" >
+        <div class="adder">
+          <input type="text" class="input" placeholder="Add items in your list"/>
+          <span class="add">+</span>
+        </div>
+        <ul id="doing" ondrop="drop(event)" ondragover="allowDrop(event)">
+          <li class="draggable" draggable="true" id="card2" ondragstart="drag(event)">HTML</li>
+        </ul>
+      </div>
+    </div>
   </body>
+  <script type="text/JavaScript" src="application.js"></script>
 </html>
