@@ -1,6 +1,73 @@
-let btn = document.querySelector('.add');
+var dr = dragula({})
+
+dr.on('drag', (evt) => {
+  evt.classList.add('rotateOnDrag');
+});
+
+dr.on('dragend', (evt) => {
+  evt.classList.remove('rotateOnDrag');
+});
+
+$('.project-task-container')
+  .toArray()
+  .forEach(function(v){
+    dr.containers.push(v)
+  })
+
+$('.tiny-editor').change(function(){
+  // const dom = $('.tiny-editor')
+  // let val = dom.val()
+  // dom.val(markdown.toHTML(val))
+})
+
+// var popper = new Popper($('#submit')[0], {
+// 		content: 'submit'	
+// 	}, {
+// 			placement: 'left'
+// 	});
+
+let btnAdd = document.querySelector('.add');
+let newTaskInput = document.getElementById("new-task");
+let todo = document.getElementById("todo-task");
 let remove = document.querySelector('.draggable');
-let listTasks = [];
+let listTasks  = [];
+
+let createNewTaskHtml = function(task) {
+  let projectTask = document.createElement("div");
+  let titleTask = document.createElement("span");
+  let controlContainer = document.createElement("div");
+  let editbutton = document.createElement("div");
+  let submitbutton = document.createElement("div");
+  let deletebutton = document.createElement("div");
+  let taskId = Date.now();
+
+  projectTask.className = "project-task";
+  titleTask.className = "task-title";
+  controlContainer.className = "control-container";
+  editbutton.className = "control-circle";
+  submitbutton.className = "control-circle"
+  deletebutton.className = "control-circle";
+  
+  editbutton.id = "edit";
+  deletebutton.id = "delete";
+  submitbutton.id = "submit";
+
+  titleTask.innerHTML = task
+  projectTask.setAttribute("task_id", taskId);
+
+  projectTask.appendChild(titleTask);
+  projectTask.appendChild(controlContainer);
+  controlContainer.appendChild(editbutton);
+  controlContainer.appendChild(deletebutton);
+  controlContainer.appendChild(submitbutton);
+}
+
+let initTask = function(){
+  listTasks = localStorage.getItem("task") ? JSON.parse(localStorage.getItem("task")) : [];
+  listTasks.forEach(item => createNewTaskHtml(item['text']));
+}
+
+initTask();
 
 function allowDrop(ev) {
   ev.preventDefault();
@@ -16,131 +83,54 @@ function drop(ev) {
   ev.target.appendChild(document.getElementById(data));
 }
 
-// function dragStart(e) {
-//   console.log("dragStart");
-//   this.style.opacity = '0.4';
-//   dragSrcEl = this;
-//   e.dataTransfer.effectAllowed = 'move';
-//   e.dataTransfer.setData('text/html', this.innerHTML);
-// }
+function createNewTaskElement(task) {
+  let projectTask = document.createElement("div");
+  let titleTask = document.createElement("span");
+  let controlContainer = document.createElement("div");
+  let editbutton = document.createElement("div");
+  let submitbutton = document.createElement("div");
+  let deletebutton = document.createElement("div");
+  let taskId = Date.now();
 
-// function dragEnter(e) {
-//   console.log("dragEnd");
-//   this.classList.add('over');
-// }
+  projectTask.className = "project-task";
+  titleTask.className = "task-title";
+  controlContainer.className = "control-container";
+  editbutton.className = "control-circle";
+  submitbutton.className = "control-circle"
+  deletebutton.className = "control-circle";
+  
+  editbutton.id = "edit";
+  deletebutton.id = "delete";
+  submitbutton.id = "submit";
 
-// function dragLeave(e) {
-//   console.log("dragLeave");
-//   e.stopPropagation();
-//   this.classList.remove('over');
-// }
+  titleTask.innerHTML = task
+  projectTask.setAttribute("task_id", taskId);
 
-// function dragOver(e) {
-//   console.log("dragOver");
-//   e.preventDefault();
-//   e.dataTransfer.dropEffect = 'move';
-//   return false;
-// }
+  projectTask.appendChild(titleTask);
+  projectTask.appendChild(controlContainer);
+  controlContainer.appendChild(editbutton);
+  controlContainer.appendChild(deletebutton);
+  controlContainer.appendChild(submitbutton);
+  listTasks.push({
+    taskId: taskId,
+    text: task,
+  })
 
-// function dragDrop(e) {
-//   console.log("dragDrop");
-//   if (dragSrcEl != this) {
-//     dragSrcEl.innerHTML = this.innerHTML;
-//     this.innerHTML = e.dataTransfer.getData('text/html');
-//   }
-//   return false;
-// }
-
-// function dragEnd(e) {
-//   console.log("dragEnd");
-//   let listItens = document.querySelectorAll('.draggable');
-//   [].forEach.call(listItens, function(item) {
-//     item.classList.remove('over');
-//   });
-//   this.style.opacity = '1';
-// }
-
-
-// function addEventsDragAndDrop(el) {
-//   el.addEventListener('dragstart', dragStart, false);
-//   console.log(el);
-//   console.log(el.addEventListener('dragstart', dragStart, false));
-//   el.addEventListener('dragenter', dragEnter, false);
-//   el.addEventListener('dragover', dragOver, false);
-//   el.addEventListener('dragleave', dragLeave, false);
-//   el.addEventListener('drop', dragDrop, false);
-//   el.addEventListener('dragend', dragEnd, false);
-// }
-
-// let listItens = document.querySelectorAll('.draggable');
-// [].forEach.call(listItens, function(item) {
-//   console.log(listItens)
-//   addEventsDragAndDrop(item);
-// });
-
-//  add event for element
-function addEventsDragAndDrop(el) {
-  el.addEventListener('dragstart', function(event){
-    drag(event);
-    console.log(event);
-  });
+  return projectTask;
 }
 
-let editTask = function() {
-  console.log("editTask")
-  let listItem = this.parentNode;
-  let editInput = listItem.querySelector('input[type=text]');
-  let containsClass = listItem.classList.contains("editMode");
-  if (containsClass) {
 
-  } else {
-    editInput.value = label.innerText
+let addTask = function() {
+  if (!newTaskInput.value.length || !newTaskInput.value.trim().length){
+    alert("Name task can't null, please enter name task!");
+    return false;
   }
+  localStorage.setItem('task', JSON.stringify(listTasks));
+
+  let task = createNewTaskElement(newTaskInput.value);
+  todo.prepend(task);
+  newTaskInput.value = "";
+  return true;
 }
 
-function addEditTask(el) {
-  el.addEventListener('click', function(event){
-    editTask();
-  });
-}
-/*
-
-*/
-function addNewItem() {
-  let newItem = document.querySelector('.input').value;
-  if (newItem != '') {
-    document.querySelector('.input').value = '';
-    let li = document.createElement('li');
-    let attr = document.createAttribute('draggable');
-    let ul = document.querySelector('ul');
-    let editInput = document.createElement("input");
-    let editButton = document.createElement("span");
-    let deleteButton = document.createElement("span");
-
-    editInput.type = "text";
-    editButton.innerText = "Edit";
-    editButton.className = "edit";
-    deleteButton.innerText = "Delete";
-    deleteButton.className = "delete";
-
-    li.appendChild(editInput);
-    li.appendChild(editButton);
-    li.appendChild(deleteButton)
-
-    li.className = 'draggable';
-    attr.value = 'true';
-    li.setAttributeNode(attr);
-    li.setAttribute('id', new Date().getTime());
-    li.appendChild(document.createTextNode(newItem));
-    ul.appendChild(li);
-    addEventsDragAndDrop(li);
-
-    addEditTask(editButton);
-    li.onclick = editTask();
-    localStorage.setItem('id', JSON.stringify(listTasks))
-    console.log(listTasks);
-  }
-}
-
-btn.addEventListener('click', addNewItem);
-
+btnAdd.addEventListener("click", addTask);

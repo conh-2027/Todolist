@@ -4,29 +4,72 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
   </head>
   <body>
-    <h1>DRAG AND DROP HTML5</h1>
-    <div class="row">
-      <div class="col-md-6" >
-        <div class="adder">
-          <input type="text" class="input" placeholder="Add items in your list"/>
-          <span class="add">+</span>
-        </div>
-        <ul id="todo" ondrop="drop(event)" ondragover="allowDrop(event)">
-          <li class="draggable" draggable="true" id="card1" ondragstart="drag(event)">Javascript</li>
-          <li class="draggable" draggable="true" id="card3" ondragstart="drag(event)">Javascript1</li>
-        </ul>
+    <div class="project-container">
+      <div class="project-title-container">
+        <span class="project-title">To Do</span>
       </div>
-
-      <div class="col-md-6" >
-        <div class="adder">
-          <input type="text" class="input" placeholder="Add items in your list"/>
+      <div class="project-task-container" id="todo-task">
+        <div class="project-task">
+          <input type="text" class="input form-control" id="new-task" placeholder="add new tasl ...">
           <span class="add">+</span>
         </div>
-        <ul id="doing" ondrop="drop(event)" ondragover="allowDrop(event)">
-          <li class="draggable" draggable="true" id="card2" ondragstart="drag(event)">HTML</li>
-        </ul>
       </div>
     </div>
+    
+    <div class="project-container">
+      <div class="project-title-container">
+        <span class="project-title">Doing</span>
+      </div>
+      <div class="project-task-container">
+        <div class="project-task">
+          <span class="task-title">fix all the known bugs</span>
+          <div class="control-container">
+            <div class="control-circle" id="submit"></div>
+            <div class="control-circle" id="edit"></div>
+            <div class="control-circle" id="delete"></div>
+          </div>
+        </div>
+        <div class="project-task">
+          <span class="task-title">generate excel file</span>
+          <div class="control-container">
+            <div class="control-circle" id="submit"></div>
+            <div class="control-circle" id="edit"></div>
+            <div class="control-circle" id="delete"></div>
+          </div>
+        </div>
+        <div class="project-task">
+          <span class="task-title">find the bug with calc</span>
+          <div class="control-container">
+            <div class="control-circle" id="submit"></div>
+            <div class="control-circle" id="edit"></div>
+            <div class="control-circle" id="delete"></div>
+          </div>
+        </div>
+        <div class="project-task">
+          <span class="task-title">look for additional bugs</span>
+          <div class="control-container">
+            <div class="control-circle" id="submit"></div>
+            <div class="control-circle" id="edit"></div>
+            <div class="control-circle" id="delete"></div>
+          </div>
+        </div>
+      </div>
+      <div class="add-task-button">
+      
+      </div>
+    </div>
+    
+    <div class="editor">
+      <div class="project-title-container">
+        <span class="project-title">add note</span>
+      </div>
+      <div class="tiny-editor-container">
+        <textarea class="tiny-editor"></textarea>
+      </div>
+    </div>
+    
   </body>
+  <script type="text/JavaScript" src="jquery.min.js"></script>
+  <script type="text/JavaScript" src="dragula.min.js"></script>
   <script type="text/JavaScript" src="application.js"></script>
 </html>
