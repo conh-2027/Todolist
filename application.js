@@ -60,6 +60,7 @@ let createNewTaskHtml = function(task) {
   controlContainer.appendChild(editbutton);
   controlContainer.appendChild(deletebutton);
   controlContainer.appendChild(submitbutton);
+  todo.appendChild(projectTask);
 }
 
 let initTask = function(){
