@@ -65,10 +65,26 @@ let createNewTaskHtml = function(task) {
 
 let initTask = function(){
   listTasks = localStorage.getItem("task") ? JSON.parse(localStorage.getItem("task")) : [];
+  console.table(listTasks)
   listTasks.forEach(item => createNewTaskHtml(item['text']));
 }
 
 initTask();
+
+let taskControl = function(listTasks, action, task) {
+  let taskId = listTasks.getAttribute('task_id');
+
+  let list = JSON.parse(localStorage.get("task"));
+  let index = list.findIndex(item => item.task_id == taskId);
+
+  switch(action) {
+    case 'delete': {
+      list.splice(index, 1);
+      break;
+    }
+  }
+  localStorage.setItem("task", JSON.parse(list));
+}
 
 function allowDrop(ev) {
   ev.preventDefault();
@@ -85,6 +101,7 @@ function drop(ev) {
 }
 
 function createNewTaskElement(task) {
+
   let projectTask = document.createElement("div");
   let titleTask = document.createElement("span");
   let controlContainer = document.createElement("div");
@@ -112,10 +129,13 @@ function createNewTaskElement(task) {
   controlContainer.appendChild(editbutton);
   controlContainer.appendChild(deletebutton);
   controlContainer.appendChild(submitbutton);
+  
   listTasks.push({
     taskId: taskId,
     text: task,
   })
+
+  localStorage.setItem('task', JSON.stringify(listTasks));
 
   return projectTask;
 }
@@ -126,12 +146,34 @@ let addTask = function() {
     alert("Name task can't null, please enter name task!");
     return false;
   }
-  localStorage.setItem('task', JSON.stringify(listTasks));
 
   let task = createNewTaskElement(newTaskInput.value);
-  todo.prepend(task);
+  todo.append(task);
   newTaskInput.value = "";
   return true;
+}
+
+let taskTodo = function() {
+  let listTask = this.parentNode;
+  todo.appendChild(listTask);
+  bindTaskEvent(listTask, taskDone);
+  taskControl(listTask, 'todo');
+}
+
+
+let editTask = function() {
+
+}
+
+let deleteTask = function() {
+  let project_task = this.parentNode;
+  let task = proejct_task.parentNode;
+  task.removeChild(project_task, "delete")
+}
+
+let bindTaskEvent = function() {
+  let deleteButton = document.querySelectorAll("delete");
+  deletebutton.onclick = deleteButton;
 }
 
 btnAdd.addEventListener("click", addTask);
