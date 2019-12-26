@@ -26,65 +26,68 @@ $('.tiny-editor').change(function(){
 // 			placement: 'left'
 // 	});
 
+
+// init element.
 let btnAdd = document.querySelector('.add');
 let newTaskInput = document.getElementById("new-task");
 let todo = document.getElementById("todo-task");
-let remove = document.querySelector('.draggable');
-let listTasks  = [];
+let listTasks = localStorage.getItem("task") ? JSON.parse(localStorage.getItem("task")) : [];
 
-let createNewTaskHtml = function(task) {
+// create elament and add to list task.
+function createNewTaskElement(task) {
+  return createTaskElement(task);
+}
+
+function createTaskElement(taskText, taskId = 0) {
   let projectTask = document.createElement("div");
   let titleTask = document.createElement("span");
   let controlContainer = document.createElement("div");
   let editbutton = document.createElement("div");
-  let submitbutton = document.createElement("div");
   let deletebutton = document.createElement("div");
-  let taskId = Date.now();
+  
+  if(taskId === 0){
+    taskId = Date.now();
+
+    listTasks.push({
+      taskId: taskId,
+      text: taskText,
+    });
+    localStorage.setItem('task', JSON.stringify(listTasks));
+  }
 
   projectTask.className = "project-task";
   titleTask.className = "task-title";
   controlContainer.className = "control-container";
-  editbutton.className = "control-circle";
-  submitbutton.className = "control-circle"
-  deletebutton.className = "control-circle";
+  editbutton.className = "btn btn-warning btn-sm mr-2 edit-task";
+  deletebutton.className = "btn btn-danger btn-sm delete-task";
   
-  editbutton.id = "edit";
-  deletebutton.id = "delete";
-  submitbutton.id = "submit";
+  editbutton.class = "edit";
+  deletebutton.class = "delete";
 
-  titleTask.innerHTML = task
+  editbutton.innerHTML = "edit";
+  deletebutton.innerHTML = "delete";
+  titleTask.innerHTML = taskText
   projectTask.setAttribute("task_id", taskId);
 
   projectTask.appendChild(titleTask);
   projectTask.appendChild(controlContainer);
   controlContainer.appendChild(editbutton);
   controlContainer.appendChild(deletebutton);
-  controlContainer.appendChild(submitbutton);
-  todo.appendChild(projectTask);
+
+  return projectTask;
 }
 
 let initTask = function(){
-  listTasks = localStorage.getItem("task") ? JSON.parse(localStorage.getItem("task")) : [];
-  console.table(listTasks)
-  listTasks.forEach(item => createNewTaskHtml(item['text']));
+  $.each(listTasks, function (_, value) {
+    console.log(value['text']);
+    let task = createTaskElement(value['text'], value['taskId']);
+    todo.appendChild(task);
+  });
 }
 
 initTask();
-
-let taskControl = function(listTasks, action, task) {
-  let taskId = listTasks.getAttribute('task_id');
-
-  let list = JSON.parse(localStorage.get("task"));
-  let index = list.findIndex(item => item.task_id == taskId);
-
-  switch(action) {
-    case 'delete': {
-      list.splice(index, 1);
-      break;
-    }
-  }
-  localStorage.setItem("task", JSON.parse(list));
-}
+delete_task();
+edit_task();
 
 function allowDrop(ev) {
   ev.preventDefault();
@@ -100,47 +103,6 @@ function drop(ev) {
   ev.target.appendChild(document.getElementById(data));
 }
 
-function createNewTaskElement(task) {
-
-  let projectTask = document.createElement("div");
-  let titleTask = document.createElement("span");
-  let controlContainer = document.createElement("div");
-  let editbutton = document.createElement("div");
-  let submitbutton = document.createElement("div");
-  let deletebutton = document.createElement("div");
-  let taskId = Date.now();
-
-  projectTask.className = "project-task";
-  titleTask.className = "task-title";
-  controlContainer.className = "control-container";
-  editbutton.className = "control-circle";
-  submitbutton.className = "control-circle"
-  deletebutton.className = "control-circle";
-  
-  editbutton.id = "edit";
-  deletebutton.id = "delete";
-  submitbutton.id = "submit";
-
-  titleTask.innerHTML = task
-  projectTask.setAttribute("task_id", taskId);
-
-  projectTask.appendChild(titleTask);
-  projectTask.appendChild(controlContainer);
-  controlContainer.appendChild(editbutton);
-  controlContainer.appendChild(deletebutton);
-  controlContainer.appendChild(submitbutton);
-  
-  listTasks.push({
-    taskId: taskId,
-    text: task,
-  })
-
-  localStorage.setItem('task', JSON.stringify(listTasks));
-
-  return projectTask;
-}
-
-
 let addTask = function() {
   if (!newTaskInput.value.length || !newTaskInput.value.trim().length){
     alert("Name task can't null, please enter name task!");
@@ -150,30 +112,45 @@ let addTask = function() {
   let task = createNewTaskElement(newTaskInput.value);
   todo.append(task);
   newTaskInput.value = "";
+  delete_task();
+  edit_task();
   return true;
 }
 
-let taskTodo = function() {
-  let listTask = this.parentNode;
-  todo.appendChild(listTask);
-  bindTaskEvent(listTask, taskDone);
-  taskControl(listTask, 'todo');
-}
-
-
-let editTask = function() {
-
-}
-
-let deleteTask = function() {
-  let project_task = this.parentNode;
-  let task = proejct_task.parentNode;
-  task.removeChild(project_task, "delete")
-}
-
-let bindTaskEvent = function() {
-  let deleteButton = document.querySelectorAll("delete");
-  deletebutton.onclick = deleteButton;
-}
-
 btnAdd.addEventListener("click", addTask);
+
+function delete_task() {
+  $(".delete-task").click(function() {
+    delete_id = parseInt(this.parentElement.parentElement.getAttribute('task_id'));
+    listTasks = listTasks.filter(value => value['taskId'] !== delete_id);
+    localStorage.setItem('task', JSON.stringify(listTasks));
+    this.parentElement.parentElement.remove();
+  });
+}
+
+function edit_task() {
+  $('.edit-task').click(function() {
+
+    let parentElementEdit = this.parentElement.parentElement;
+
+    parentElementEdit.firstElementChild.remove();
+
+    let input_edit = document.createElement("input");
+    let submit_edit = document.createElement("button");
+    input_edit.className = 'edit-text'
+    input_edit.name = 'edit-text'
+    submit_edit.className = 'btn btn-success btn-sm mr-2 ml-2 submit-edit'
+    submit_edit.innerHTML = 'submit'
+
+    parentElementEdit.children[1].html('');
+    parentElementEdit.prepend(input_edit);
+    parentElementEdit.children[1].prepend(submit_edit);
+
+
+    // edit_id = parseInt(this.parentElement.parentElement.getAttribute('task_id'));
+    // index_edit = listTasks.findIndex(value => value.taskId === edit_id);
+    // listTasks[index_edit]['text'] = 'bay xxxx nv';
+    // localStorage.setItem('task', JSON.stringify(listTasks));
+    // this.parentElement.parentElement.firstElementChild.innerHTML = 'bay nv'
+  });
+}

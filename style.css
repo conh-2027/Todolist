@@ -124,3 +124,15 @@
 	 transform: rotate(7deg);
 }
  
+
+.add-task {
+	background-color: white;
+	 width: 98%;
+	 height: 40px;
+	 display: flex;
+	 align-items: center;
+	 cursor: pointer;
+	 box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.2);
+	 margin-bottom: 8px;
+	 border-radius: 3px;
+}
