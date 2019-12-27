@@ -2,10 +2,12 @@ var dr = dragula({})
 
 dr.on('drag', (evt) => {
   evt.classList.add('rotateOnDrag');
+  console.log("drag");
 });
 
 dr.on('dragend', (evt) => {
   evt.classList.remove('rotateOnDrag');
+  console.log("dragend");
 });
 
 $('.project-task-container')
@@ -128,29 +130,40 @@ function delete_task() {
   });
 }
 
+function submit_update(){
+  $('.submit-edit').click(function() {
+    let parent_element = this.parentElement.parentElement;
+    let value_text = parent_element.children[0].value;
+    edit_id = parseInt(parent_element.getAttribute('task_id'));
+    index_edit = listTasks.findIndex(value => value.taskId === edit_id);
+    listTasks[index_edit]['text'] = value_text;
+    localStorage.setItem('task', JSON.stringify(listTasks));
+    parent_element.children[0].remove();
+    span_element = document.createElement('span');
+    span_element.className = 'task-title';
+    span_element.innerHTML = value_text;
+    parent_element.prepend(span_element);
+    $('.submit-edit').remove();
+  });
+}
+
 function edit_task() {
   $('.edit-task').click(function() {
 
     let parentElementEdit = this.parentElement.parentElement;
-
-    parentElementEdit.firstElementChild.remove();
-
+    let value_old = parentElementEdit.children[0].textContent;
     let input_edit = document.createElement("input");
-    let submit_edit = document.createElement("button");
-    input_edit.className = 'edit-text'
+    let submit_edit = document.createElement("div");
+    
+    input_edit.className = 'form-control edit-text'
     input_edit.name = 'edit-text'
+    input_edit.value = value_old;
     submit_edit.className = 'btn btn-success btn-sm mr-2 ml-2 submit-edit'
     submit_edit.innerHTML = 'submit'
-
-    parentElementEdit.children[1].html('');
     parentElementEdit.prepend(input_edit);
-    parentElementEdit.children[1].prepend(submit_edit);
-
-
-    // edit_id = parseInt(this.parentElement.parentElement.getAttribute('task_id'));
-    // index_edit = listTasks.findIndex(value => value.taskId === edit_id);
-    // listTasks[index_edit]['text'] = 'bay xxxx nv';
-    // localStorage.setItem('task', JSON.stringify(listTasks));
-    // this.parentElement.parentElement.firstElementChild.innerHTML = 'bay nv'
+    parentElementEdit.children[2].prepend(submit_edit);
+    parentElementEdit.children[1].remove();
+    
+    submit_update();
   });
 }
