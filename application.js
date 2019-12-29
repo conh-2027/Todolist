@@ -23,8 +23,8 @@ dr.on('drop', (el, target, source) => {
   task_index = listTasks.findIndex(value => value.taskId === taskID);
   
   type = {'todo-task': 'New', 'doing-task': "In Process", 'done-task': 'Done'}
-  color_badge = {'todo-task': 'badge-warning', 'doing-task': 'badge-primary', 'done-task': 'badge-success'}
-  statusEl.className = 'badge ' + color_badge[target.id] + ' ' + target.id
+  color_badge = {'todo-task': 'badge-primary', 'doing-task': 'badge-warning', 'done-task': 'badge-success'}
+  statusEl.className = 'badge ' + color_badge[target.id] + ' ' + target.id + " status-task"
   statusEl.innerHTML = type[target.id];
   listTasks[task_index]["status"] =  type[target.id];
 
@@ -49,11 +49,13 @@ $('.tiny-editor').change(function(){
 
 // create elament and add to list task.
 function createNewTaskElement(task) {
-  return createTaskElement(task);
+  element = createTaskElement(task);
+  element.children[1].className = 'badge badge-primary status-task';
+  return element;
 }
 
 
-function createTaskElement(taskText, taskId = 0, status="New", classStatus= "badge status-task", currentTime = new Date()) {
+function createTaskElement(taskText, taskId = 0, status="New", classStatus= "badge badge-primary status-task", currentTime = new Date()) {
   let projectTask = document.createElement("div");
   let titleTask = document.createElement("span");
   let controlContainer = document.createElement("div");
@@ -108,18 +110,18 @@ let initTask = function(){
     let task = createTaskElement(value["text"], value["taskId"], value["status"], value["classLabel"], value["time"]);
     switch( value["status"]) {
       case "New": {
-        $('.todo-task').addClass('badge-warning');
+        $('.todo-task').addClass('badge-primary status-task');
         todo.appendChild(task);
         break;
       }
       case "In Process": {
         doing.appendChild(task);
-        $('.doing-task').addClass('badge-primary');
+        $('.doing-task').addClass('badge-warning status-task');
         break;
       }
       case "Done": {
         done.appendChild(task);
-        $('.done-task').addClass('badge-success');
+        $('.done-task').addClass('badge-success status-task');
         break;
       }
     }
@@ -130,6 +132,7 @@ let initTask = function(){
 initTask();
 delete_task();
 edit_task();
+no_submit();
 
 function allowDrop(ev) {
   ev.preventDefault();
@@ -144,22 +147,6 @@ function drop(ev) {
   let data = ev.dataTransfer.getData("text");
   ev.target.appendChild(document.getElementById(data));
 }
-
-
-// let addTask = function() {
-//   if (!newTaskInput.value.length || !newTaskInput.value.trim().length){
-//     alert("Name task can't null, please enter name task!");
-//     return false;
-//   }
-//   let task = createNewTaskElement(newTaskInput.value);
-
-//   todo.append(task);
-//   description.value = "";
-
-//   delete_task();
-//   edit_task();
-//   return true;
-// }
 
 $("#myModal").on("click", "#submit", function(e){
 
@@ -179,7 +166,6 @@ $("#myModal").on("click", "#submit", function(e){
   return true;
 })
 
-// btnAdd.addEventListener("click", addTask);
 
 function delete_task() {
   $(".delete-task").click(function() {
@@ -213,7 +199,7 @@ function edit_task() {
     edit_id = parseInt(parentElementEdit.getAttribute('task_id'));
     index_edit = listTasks.findIndex(value => value.taskId === edit_id);
     let value_old =  listTasks[index_edit]['text'];
-    let input_edit = document.createElement("textarea");
+    let input_edit = document.createElement("input");
     let submit_edit = document.createElement("div");
     
     input_edit.className = 'form-control edit-text'
@@ -230,4 +216,18 @@ function edit_task() {
     this.style.display = "none";
     submit_update(parentElementEdit, index_edit, edit_display, delete_display);
   });
+  no_submit();
+}
+
+function no_submit() {
+  $(document).on( "focusout",".edit-text", function() {
+    this.parentElement.children[2].children[0].style.display = 'inline-block';
+    this.parentElement.children[2].children[1].style.display = 'inline-block';
+    this.parentElement.children[2].children[2].remove();
+  });
+  // $(".edit-text").mouseout(function(){
+  //   this.parentElement.children[2].children[0].style.display = 'inline-block';
+  //   this.parentElement.children[2].children[1].style.display = 'inline-block';
+  //   this.parentElement.children[2].children[2].remove();
+  // });
 }
