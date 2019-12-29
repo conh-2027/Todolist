@@ -18,35 +18,30 @@ dr.on('dragend', (evt) => {
 
 dr.on('drop', (el, target) => {
   let statusEl = el.children[1];
+  taskID = parseInt(el.getAttribute("task_id"));
+  task_index = listTasks.findIndex(value => value.taskId === taskID);
 
   if (target.id === "todo-task") {
-    statusEl.classList.remove("badge-warning");
-    statusEl.classList.add("badge-primary");
+    statusEl.className = "badge badge-primary status-task"
     statusEl.innerHTML = "New";
-    taskID = parseInt(el.getAttribute("task_id"));
-    task_index = listTasks.findIndex(value => value.taskId === taskID);
     listTasks[task_index]["status"] = "New";
-    localStorage.setItem("task", JSON.stringify(listTasks));
-  }
-  if (target.id === "doing-task") {
-    statusEl.classList.remove("badge-primary");
-    statusEl.classList.add("badge-warning");
-    statusEl.innerHTML = "In Process";
-    taskID = parseInt(el.getAttribute("task_id"));
-    task_index = listTasks.findIndex(value => value.taskId === taskID);
-    listTasks[task_index]["status"] = "In Process";
-    localStorage.setItem("task", JSON.stringify(listTasks));
   }
   
-  if (target.id === "done-task") {
-    statusEl.classList.remove("badge-warning");
-    statusEl.classList.add("badge-success");
-    statusEl.innerHTML = "Done";
-    taskID = parseInt(el.getAttribute("task_id"));
-    task_index = listTasks.findIndex(value => value.taskId === taskID);
-    listTasks[task_index]["status"] = "Done";
-    localStorage.setItem("task", JSON.stringify(listTasks));
+  if (target.id === "doing-task") {
+    statusEl.className = "badge badge-warning status-task"
+    statusEl.innerHTML = "In Process";
+    listTasks[task_index]["status"] = "In Process";
   }
+  
+  
+  if (target.id === "done-task") {
+    statusEl.className = "badge badge-success status-task"
+    statusEl.innerHTML = "Done";
+    listTasks[task_index]["status"] = "Done";
+  }
+
+  listTasks[task_index]["classLabel"] = el.children[1].className
+  localStorage.setItem("task", JSON.stringify(listTasks));
 });
 
 
@@ -62,21 +57,14 @@ $('.tiny-editor').change(function(){
   // dom.val(markdown.toHTML(val))
 })
 
-// var popper = new Popper($('#submit')[0], {
-// 		content: 'submit'	
-// 	}, {
-// 			placement: 'left'
-// 	});
-
-
-// init element.
-
 // create elament and add to list task.
 function createNewTaskElement(task) {
   return createTaskElement(task);
 }
 
-function createTaskElement(taskText, taskId = 0, status = "New") {
+function createTaskElement(value) {
+  let status = value["status"] === undefined ? "New" : value["status"];
+  let classStatus = value["classLabel"] === undefined ? "badge badge-primary status-task" : value["classLabel"];
   let projectTask = document.createElement("div");
   let titleTask = document.createElement("span");
   let controlContainer = document.createElement("div");
@@ -84,14 +72,16 @@ function createTaskElement(taskText, taskId = 0, status = "New") {
   let deletebutton = document.createElement("div");
   let label = document.createElement("div");
   
-  if(taskId === 0){
+  if(value["taskId"] === 0){
     taskId = Date.now();
-
+   
     listTasks.push({
       taskId: taskId,
-      text: taskText,
-      status: status
+      text: value["text"],
+      status: status,
+      classLabel: classStatus
     });
+    
     localStorage.setItem('task', JSON.stringify(listTasks));
   }
 
@@ -100,15 +90,15 @@ function createTaskElement(taskText, taskId = 0, status = "New") {
   controlContainer.className = "control-container";
   editbutton.className = "btn btn-warning btn-sm mr-2 edit-task";
   deletebutton.className = "btn btn-danger btn-sm delete-task";
-  label.className = "badge badge-primary"
+  label.className = classStatus;
   label.innerHTML = status;
   editbutton.class = "edit";
   deletebutton.class = "delete";
 
   editbutton.innerHTML = "edit";
   deletebutton.innerHTML = "delete";
-  titleTask.innerHTML = taskText
-  projectTask.setAttribute("task_id", taskId);
+  titleTask.innerHTML = value["text"];
+  projectTask.setAttribute("task_id", value["taskId"]);
 
   projectTask.appendChild(titleTask);
   projectTask.appendChild(label);
@@ -122,7 +112,7 @@ function createTaskElement(taskText, taskId = 0, status = "New") {
 let initTask = function(){
   $.each(listTasks, function (_, value) {
     console.log(value['text']);
-    let task = createTaskElement(value['text'], value['taskId'], value["status"]);
+    let task = createTaskElement(value);
     switch( value["status"]) {
       case "New": {
         todo.appendChild(task);
@@ -184,30 +174,28 @@ function delete_task() {
   });
 }
 
-function submit_update(){
+function submit_update( parent_element, index_edit){
   $('.submit-edit').click(function() {
-    let parent_element = this.parentElement.parentElement;
     let value_text = parent_element.children[0].value;
-    edit_id = parseInt(parent_element.getAttribute('task_id'));
-    index_edit = listTasks.findIndex(value => value.taskId === edit_id);
     listTasks[index_edit]['text'] = value_text;
     localStorage.setItem('task', JSON.stringify(listTasks));
     parent_element.children[0].remove();
     span_element = document.createElement('span');
     span_element.className = 'task-title';
     span_element.innerHTML = value_text;
-    // parent_element.prepend(span_element);
-    parent_element.prepend(span_elemebadge - successnt);
+    parent_element.prepend(span_element);
     $('.submit-edit').remove();
   });
 }
 
 function edit_task() {
   $('.edit-task').click(function() {
-
+    $('.submit-edit').remove();
     let parentElementEdit = this.parentElement.parentElement;
-    let value_old = parentElementEdit.children[0].textContent;
-    let input_edit = document.createElement("input");
+    edit_id = parseInt(parentElementEdit.getAttribute('task_id'));
+    index_edit = listTasks.findIndex(value => value.taskId === edit_id);
+    let value_old =  listTasks[index_edit]['text'];
+    let input_edit = document.createElement("textarea");
     let submit_edit = document.createElement("div");
     
     input_edit.className = 'form-control edit-text'
@@ -216,9 +204,9 @@ function edit_task() {
     submit_edit.className = 'btn btn-success btn-sm mr-2 ml-2 submit-edit'
     submit_edit.innerHTML = 'submit'
     parentElementEdit.prepend(input_edit);
-    parentElementEdit.children[2].prepend(submit_edit);
+    parentElementEdit.children[3].append(submit_edit);
     parentElementEdit.children[1].remove();
     
-    submit_update();
+    submit_update(parentElementEdit, index_edit);
   });
 }
