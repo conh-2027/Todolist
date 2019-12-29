@@ -1,3 +1,9 @@
+let btnAdd = document.querySelector('.add');
+let newTaskInput = document.getElementById("new-task");
+let todo = document.getElementById("todo-task");
+let doing = document.getElementById("doing-task");
+let done = document.getElementById("done-task");
+let listTasks = localStorage.getItem("task") ? JSON.parse(localStorage.getItem("task")) : [];
 var dr = dragula({})
 
 dr.on('drag', (evt) => {
@@ -9,6 +15,40 @@ dr.on('dragend', (evt) => {
   evt.classList.remove('rotateOnDrag');
   console.log("dragend");
 });
+
+dr.on('drop', (el, target) => {
+  let statusEl = el.children[1];
+
+  if (target.id === "todo-task") {
+    statusEl.classList.remove("badge-warning");
+    statusEl.classList.add("badge-primary");
+    statusEl.innerHTML = "New";
+    taskID = parseInt(el.getAttribute("task_id"));
+    task_index = listTasks.findIndex(value => value.taskId === taskID);
+    listTasks[task_index]["status"] = "New";
+    localStorage.setItem("task", JSON.stringify(listTasks));
+  }
+  if (target.id === "doing-task") {
+    statusEl.classList.remove("badge-primary");
+    statusEl.classList.add("badge-warning");
+    statusEl.innerHTML = "In Process";
+    taskID = parseInt(el.getAttribute("task_id"));
+    task_index = listTasks.findIndex(value => value.taskId === taskID);
+    listTasks[task_index]["status"] = "In Process";
+    localStorage.setItem("task", JSON.stringify(listTasks));
+  }
+  
+  if (target.id === "done-task") {
+    statusEl.classList.remove("badge-warning");
+    statusEl.classList.add("badge-success");
+    statusEl.innerHTML = "Done";
+    taskID = parseInt(el.getAttribute("task_id"));
+    task_index = listTasks.findIndex(value => value.taskId === taskID);
+    listTasks[task_index]["status"] = "Done";
+    localStorage.setItem("task", JSON.stringify(listTasks));
+  }
+});
+
 
 $('.project-task-container')
   .toArray()
@@ -30,22 +70,19 @@ $('.tiny-editor').change(function(){
 
 
 // init element.
-let btnAdd = document.querySelector('.add');
-let newTaskInput = document.getElementById("new-task");
-let todo = document.getElementById("todo-task");
-let listTasks = localStorage.getItem("task") ? JSON.parse(localStorage.getItem("task")) : [];
 
 // create elament and add to list task.
 function createNewTaskElement(task) {
   return createTaskElement(task);
 }
 
-function createTaskElement(taskText, taskId = 0) {
+function createTaskElement(taskText, taskId = 0, status = "New") {
   let projectTask = document.createElement("div");
   let titleTask = document.createElement("span");
   let controlContainer = document.createElement("div");
   let editbutton = document.createElement("div");
   let deletebutton = document.createElement("div");
+  let label = document.createElement("div");
   
   if(taskId === 0){
     taskId = Date.now();
@@ -53,6 +90,7 @@ function createTaskElement(taskText, taskId = 0) {
     listTasks.push({
       taskId: taskId,
       text: taskText,
+      status: status
     });
     localStorage.setItem('task', JSON.stringify(listTasks));
   }
@@ -62,7 +100,8 @@ function createTaskElement(taskText, taskId = 0) {
   controlContainer.className = "control-container";
   editbutton.className = "btn btn-warning btn-sm mr-2 edit-task";
   deletebutton.className = "btn btn-danger btn-sm delete-task";
-  
+  label.className = "badge badge-primary"
+  label.innerHTML = status;
   editbutton.class = "edit";
   deletebutton.class = "delete";
 
@@ -72,6 +111,7 @@ function createTaskElement(taskText, taskId = 0) {
   projectTask.setAttribute("task_id", taskId);
 
   projectTask.appendChild(titleTask);
+  projectTask.appendChild(label);
   projectTask.appendChild(controlContainer);
   controlContainer.appendChild(editbutton);
   controlContainer.appendChild(deletebutton);
@@ -82,8 +122,22 @@ function createTaskElement(taskText, taskId = 0) {
 let initTask = function(){
   $.each(listTasks, function (_, value) {
     console.log(value['text']);
-    let task = createTaskElement(value['text'], value['taskId']);
-    todo.appendChild(task);
+    let task = createTaskElement(value['text'], value['taskId'], value["status"]);
+    switch( value["status"]) {
+      case "New": {
+        todo.appendChild(task);
+        break;
+      }
+      case "In Process": {
+        doing.appendChild(task);
+        break;
+      }
+      case "Done": {
+        done.appendChild(task);
+        break;
+      }
+    }
+    localStorage.setItem("task", JSON.stringify(listTasks));
   });
 }
 
@@ -142,7 +196,8 @@ function submit_update(){
     span_element = document.createElement('span');
     span_element.className = 'task-title';
     span_element.innerHTML = value_text;
-    parent_element.prepend(span_element);
+    // parent_element.prepend(span_element);
+    parent_element.prepend(span_elemebadge - successnt);
     $('.submit-edit').remove();
   });
 }
