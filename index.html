@@ -4,33 +4,33 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
   </head>
   <body>
-    <div class="project-container">
-      <div class="project-title-container">
-        <span class="project-title">New Task</span>
+      <div class="project-container">
+        <div class="project-title-container">
+          <span class="project-title">New Task</span>
+        </div>
+        <div class="add-task">
+          <input type="text" class="input form-control" id="new-task" placeholder="add new task ...">
+          <span class="add btn btn-success">+</span>
+        </div>
+        <div class="project-task-container" id="todo-task">
+        </div>
       </div>
-      <div class="add-task">
-        <input type="text" class="input form-control" id="new-task" placeholder="add new task ...">
-        <span class="add btn btn-success">+</span>
+      <div class="project-container">
+        <div class="project-title-container">
+          <span class="project-title">Doing Task</span>
+        </div>
+        <div class="project-task-container" id="doing-task">
+        </div>
       </div>
-      <div class="project-task-container" id="todo-task">
+      <div class="project-container">
+        <div class="project-title-container">
+          <span class="project-title">Done Task</span>
+        </div>
+        <div class="project-task-container" id="done-task">
+        </div>
       </div>
-    </div>
-    <div class="project-container">
-      <div class="project-title-container">
-        <span class="project-title">Doing Task</span>
-      </div>
-      <div class="project-task-container" id="doing-task">
-      </div>
-    </div>
-    <div class="project-container">
-      <div class="project-title-container">
-        <span class="project-title">Done Task</span>
-      </div>
-      <div class="project-task-container" id="done-task">
-      </div>
-    </div>
-  </body>
-  <script type="text/JavaScript" src="jquery.min.js"></script>
-  <script type="text/JavaScript" src="dragula.min.js"></script>
+    </body>
+    <script type="text/JavaScript" src="jquery.min.js"></script>
+    <script type="text/JavaScript" src="dragula.min.js"></script>
   <script type="text/JavaScript" src="application.js"></script>
 </html>

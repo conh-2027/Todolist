@@ -129,3 +129,7 @@ body {
 .status-task {
 	float: right;
 }
+.time {
+	float: right;
+	margin-top: -11px;
+}

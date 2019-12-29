@@ -16,40 +16,41 @@ dr.on('dragend', (evt) => {
   console.log("dragend");
 });
 
-dr.on('drop', (el, target) => {
+dr.on('drop', (el, target, source) => {
   let statusEl = el.children[1];
   taskID = parseInt(el.getAttribute("task_id"));
   task_index = listTasks.findIndex(value => value.taskId === taskID);
-
-  if (target.id === "todo-task") {
+  
+  if (source.id === "doing-task" && target.id === "todo-task") {
     statusEl.className = "badge badge-primary status-task"
     statusEl.innerHTML = "New";
     listTasks[task_index]["status"] = "New";
   }
   
-  if (target.id === "doing-task") {
+  if ((source.id === "done-task" || source.id === "todo-task") && target.id === "doing-task") {
     statusEl.className = "badge badge-warning status-task"
     statusEl.innerHTML = "In Process";
     listTasks[task_index]["status"] = "In Process";
   }
   
   
-  if (target.id === "done-task") {
+  if (source.id === "doing-task" && target.id === "done-task") {
     statusEl.className = "badge badge-success status-task"
     statusEl.innerHTML = "Done";
     listTasks[task_index]["status"] = "Done";
   }
-
+  let time = new Date();
+  listTasks[task_index]["time"] = time.toLocaleString() + " edited";
   listTasks[task_index]["classLabel"] = el.children[1].className
   localStorage.setItem("task", JSON.stringify(listTasks));
 });
 
 
 $('.project-task-container')
-  .toArray()
-  .forEach(function(v){
-    dr.containers.push(v)
-  })
+.toArray()
+.forEach(function(v){
+  dr.containers.push(v)
+})
 
 $('.tiny-editor').change(function(){
   // const dom = $('.tiny-editor')
@@ -62,26 +63,27 @@ function createNewTaskElement(task) {
   return createTaskElement(task);
 }
 
-function createTaskElement(value) {
-  let status = value["status"] === undefined ? "New" : value["status"];
-  let classStatus = value["classLabel"] === undefined ? "badge badge-primary status-task" : value["classLabel"];
+
+function createTaskElement(taskText, taskId = 0, status="New", classStatus= "badge badge-primary status-task", currentTime = new Date()) {
   let projectTask = document.createElement("div");
   let titleTask = document.createElement("span");
   let controlContainer = document.createElement("div");
   let editbutton = document.createElement("div");
   let deletebutton = document.createElement("div");
   let label = document.createElement("div");
-  
-  if(value["taskId"] === 0){
+  let timechange = document.createElement("small");
+
+  let time = currentTime;
+  if(taskId === 0){
     taskId = Date.now();
    
     listTasks.push({
       taskId: taskId,
-      text: value["text"],
+      text: taskText,
       status: status,
+      time: time,
       classLabel: classStatus
     });
-    
     localStorage.setItem('task', JSON.stringify(listTasks));
   }
 
@@ -94,17 +96,19 @@ function createTaskElement(value) {
   label.innerHTML = status;
   editbutton.class = "edit";
   deletebutton.class = "delete";
-
+  timechange.className = "badge time"
   editbutton.innerHTML = "edit";
   deletebutton.innerHTML = "delete";
-  titleTask.innerHTML = value["text"];
-  projectTask.setAttribute("task_id", value["taskId"]);
+  titleTask.innerHTML = taskText;
+  timechange.innerHTML = time.toLocaleString();
+  projectTask.setAttribute("task_id", taskId);
 
   projectTask.appendChild(titleTask);
   projectTask.appendChild(label);
   projectTask.appendChild(controlContainer);
   controlContainer.appendChild(editbutton);
   controlContainer.appendChild(deletebutton);
+  projectTask.appendChild(timechange);
 
   return projectTask;
 }
@@ -112,7 +116,7 @@ function createTaskElement(value) {
 let initTask = function(){
   $.each(listTasks, function (_, value) {
     console.log(value['text']);
-    let task = createTaskElement(value);
+    let task = createTaskElement(value["text"], value["taskId"], value["status"], value["classLabel"], value["time"]);
     switch( value["status"]) {
       case "New": {
         todo.appendChild(task);
