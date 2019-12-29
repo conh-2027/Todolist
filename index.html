@@ -1,36 +1,62 @@
 <html>
   <head>
     <link rel="stylesheet" href="style.css" type="text/css" media="screen" char0set="utf-8">
+    <link rel="stylesheet" href="dragula.min.css" type="text/css" media="screen" char0set="utf-8">
+
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
   </head>
   <body>
-      <div class="project-container">
-        <div class="project-title-container">
-          <span class="project-title">New Task</span>
+    <div class="row">
+      <div class="add-task">
+        <a href="#myModal" class="btn btn-primary btn-sm" data-toggle="modal">Add task</a>
+      </div>
+      
+        <div class="project-container">
+          <div class="project-title-container">
+            <span class="project-title">New Task</span>
+          </div>
+          <div class="project-task-container" id="todo-task">
+          </div>
         </div>
-        <div class="add-task">
-          <input type="text" class="input form-control" id="new-task" placeholder="add new task ...">
-          <span class="add btn btn-success">+</span>
+        <div class="project-container">
+          <div class="project-title-container">
+            <span class="project-title">Doing Task</span>
+          </div>
+          <div class="project-task-container" id="doing-task">
+          </div>
         </div>
-        <div class="project-task-container" id="todo-task">
+        <div class="project-container">
+          <div class="project-title-container">
+            <span class="project-title">Done Task</span>
+          </div>
+          <div class="project-task-container" id="done-task">
+          </div>
+        </div>
+        <!-- Modal HTML -->
+    </div>
+    <div id="myModal" class="modal fade">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">New task</h5>
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+          </div>
+          <div class="modal-body">
+            <form>
+              <div class="form-group">
+                <label for="exampleInputPassword1">Todo</label>
+                <textarea class="form-control" rows="5" id="description"></textarea>
+              </div>
+              <button type="submit" class="btn btn-primary" id="submit">Submit</button>
+            </form>
+          </div>
         </div>
       </div>
-      <div class="project-container">
-        <div class="project-title-container">
-          <span class="project-title">Doing Task</span>
-        </div>
-        <div class="project-task-container" id="doing-task">
-        </div>
-      </div>
-      <div class="project-container">
-        <div class="project-title-container">
-          <span class="project-title">Done Task</span>
-        </div>
-        <div class="project-task-container" id="done-task">
-        </div>
-      </div>
-    </body>
-    <script type="text/JavaScript" src="jquery.min.js"></script>
-    <script type="text/JavaScript" src="dragula.min.js"></script>
+    </div>
+  </body>
+  <script type="text/JavaScript" src="jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+  <script type="text/JavaScript" src="dragula.min.js"></script>
   <script type="text/JavaScript" src="application.js"></script>
 </html>

@@ -1,8 +1,9 @@
-let btnAdd = document.querySelector('.add');
+let btnAdd = document.querySelector('add');
 let newTaskInput = document.getElementById("new-task");
 let todo = document.getElementById("todo-task");
 let doing = document.getElementById("doing-task");
 let done = document.getElementById("done-task");
+let description = document.getElementById("description");
 let listTasks = localStorage.getItem("task") ? JSON.parse(localStorage.getItem("task")) : [];
 var dr = dragula({})
 
@@ -21,24 +22,12 @@ dr.on('drop', (el, target, source) => {
   taskID = parseInt(el.getAttribute("task_id"));
   task_index = listTasks.findIndex(value => value.taskId === taskID);
   
-  if (source.id === "doing-task" && target.id === "todo-task") {
-    statusEl.className = "badge badge-primary status-task"
-    statusEl.innerHTML = "New";
-    listTasks[task_index]["status"] = "New";
-  }
-  
-  if ((source.id === "done-task" || source.id === "todo-task") && target.id === "doing-task") {
-    statusEl.className = "badge badge-warning status-task"
-    statusEl.innerHTML = "In Process";
-    listTasks[task_index]["status"] = "In Process";
-  }
-  
-  
-  if (source.id === "doing-task" && target.id === "done-task") {
-    statusEl.className = "badge badge-success status-task"
-    statusEl.innerHTML = "Done";
-    listTasks[task_index]["status"] = "Done";
-  }
+  type = {'todo-task': 'New', 'doing-task': "In Process", 'done-task': 'Done'}
+  color_badge = {'todo-task': 'badge-primary', 'doing-task': 'badge-warning', 'done-task': 'badge-success'}
+  statusEl.className = 'badge ' + color_badge[target.id] + ' ' + target.id + " status-task"
+  statusEl.innerHTML = type[target.id];
+  listTasks[task_index]["status"] =  type[target.id];
+
   let time = new Date();
   listTasks[task_index]["time"] = time.toLocaleString() + " edited";
   listTasks[task_index]["classLabel"] = el.children[1].className
@@ -60,7 +49,9 @@ $('.tiny-editor').change(function(){
 
 // create elament and add to list task.
 function createNewTaskElement(task) {
-  return createTaskElement(task);
+  element = createTaskElement(task);
+  element.children[1].className = 'badge badge-primary status-task';
+  return element;
 }
 
 
@@ -119,15 +110,18 @@ let initTask = function(){
     let task = createTaskElement(value["text"], value["taskId"], value["status"], value["classLabel"], value["time"]);
     switch( value["status"]) {
       case "New": {
+        $('.todo-task').addClass('badge-primary status-task');
         todo.appendChild(task);
         break;
       }
       case "In Process": {
         doing.appendChild(task);
+        $('.doing-task').addClass('badge-warning status-task');
         break;
       }
       case "Done": {
         done.appendChild(task);
+        $('.done-task').addClass('badge-success status-task');
         break;
       }
     }
@@ -138,6 +132,7 @@ let initTask = function(){
 initTask();
 delete_task();
 edit_task();
+no_submit();
 
 function allowDrop(ev) {
   ev.preventDefault();
@@ -153,21 +148,24 @@ function drop(ev) {
   ev.target.appendChild(document.getElementById(data));
 }
 
-let addTask = function() {
-  if (!newTaskInput.value.length || !newTaskInput.value.trim().length){
+$("#myModal").on("click", "#submit", function(e){
+
+  if (!description.value.length || !description.value.trim().length){
     alert("Name task can't null, please enter name task!");
     return false;
   }
 
-  let task = createNewTaskElement(newTaskInput.value);
+  let task = createNewTaskElement(description.value);
   todo.append(task);
-  newTaskInput.value = "";
+
+  description.value = "";
   delete_task();
   edit_task();
-  return true;
-}
+  $("#myModal").modal("toggle");
 
-btnAdd.addEventListener("click", addTask);
+  return true;
+})
+
 
 function delete_task() {
   $(".delete-task").click(function() {
@@ -178,7 +176,7 @@ function delete_task() {
   });
 }
 
-function submit_update( parent_element, index_edit){
+function submit_update( parent_element, index_edit, edit_display, delete_display){
   $('.submit-edit').click(function() {
     let value_text = parent_element.children[0].value;
     listTasks[index_edit]['text'] = value_text;
@@ -188,6 +186,8 @@ function submit_update( parent_element, index_edit){
     span_element.className = 'task-title';
     span_element.innerHTML = value_text;
     parent_element.prepend(span_element);
+    edit_display.style.display = "inline-block";
+    delete_display.style.display = "inline-block";
     $('.submit-edit').remove();
   });
 }
@@ -199,7 +199,7 @@ function edit_task() {
     edit_id = parseInt(parentElementEdit.getAttribute('task_id'));
     index_edit = listTasks.findIndex(value => value.taskId === edit_id);
     let value_old =  listTasks[index_edit]['text'];
-    let input_edit = document.createElement("textarea");
+    let input_edit = document.createElement("input");
     let submit_edit = document.createElement("div");
     
     input_edit.className = 'form-control edit-text'
@@ -210,7 +210,24 @@ function edit_task() {
     parentElementEdit.prepend(input_edit);
     parentElementEdit.children[3].append(submit_edit);
     parentElementEdit.children[1].remove();
-    
-    submit_update(parentElementEdit, index_edit);
+    edit_display = this;
+    delete_display = this.parentNode.children[1]
+    delete_display.style.display = "none"
+    this.style.display = "none";
+    submit_update(parentElementEdit, index_edit, edit_display, delete_display);
   });
+  no_submit();
+}
+
+function no_submit() {
+  $(document).on( "focusout",".edit-text", function() {
+    this.parentElement.children[2].children[0].style.display = 'inline-block';
+    this.parentElement.children[2].children[1].style.display = 'inline-block';
+    this.parentElement.children[2].children[2].remove();
+  });
+  // $(".edit-text").mouseout(function(){
+  //   this.parentElement.children[2].children[0].style.display = 'inline-block';
+  //   this.parentElement.children[2].children[1].style.display = 'inline-block';
+  //   this.parentElement.children[2].children[2].remove();
+  // });
 }
