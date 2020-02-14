@@ -1,21 +1,23 @@
-let btnAdd = document.querySelector('add');
+
+// Khơi tạo các input, cột todo, doing, done, listTask lưu task trong localstorage 
+
 let newTaskInput = document.getElementById("new-task");
 let todo = document.getElementById("todo-task");
 let doing = document.getElementById("doing-task");
 let done = document.getElementById("done-task");
 let description = document.getElementById("description");
 let listTasks = localStorage.getItem("task") ? JSON.parse(localStorage.getItem("task")) : [];
-var dr = dragula({})
+var dr = dragula({});
 
-dr.on('drag', (evt) => {
-  evt.classList.add('rotateOnDrag');
-  console.log("drag");
-});
+function getDateTime() {}
 
-dr.on('dragend', (evt) => {
-  evt.classList.remove('rotateOnDrag');
-  console.log("dragend");
-});
+/*
+  Hàm này bắt sự kiên drop element task đến target nào.
+  thì  mình sẽ set status cảu task qua các trang thái tương ứng với target đến 
+  ví dụ task mới tạo thì status = new -- > doing
+  ta sẽ update lại status = in process, color label status, lưu lại local storage. 
+*/
+
 
 dr.on('drop', (el, target, source) => {
   let statusEl = el.children[1];
@@ -29,22 +31,18 @@ dr.on('drop', (el, target, source) => {
   listTasks[task_index]["status"] =  type[target.id];
 
   let time = new Date();
-  listTasks[task_index]["time"] = time.toLocaleString() + " edited";
+  console.log(time);
+  listTasks[task_index]["time"] = time.toLocaleDateString();
   listTasks[task_index]["classLabel"] = el.children[1].className
   localStorage.setItem("task", JSON.stringify(listTasks));
 });
 
+// Convert element trong class `.project-task-container` array dung vong lặp để push vào container 
 
 $('.project-task-container')
 .toArray()
 .forEach(function(v){
   dr.containers.push(v)
-})
-
-$('.tiny-editor').change(function(){
-  // const dom = $('.tiny-editor')
-  // let val = dom.val()
-  // dom.val(markdown.toHTML(val))
 })
 
 // create elament and add to list task.
@@ -54,8 +52,14 @@ function createNewTaskElement(task) {
   return element;
 }
 
+/*
+  Hàm này create element, add attribute của thẻ html 
+  append vào vào html tương ứng . lưu vào  localstorage
 
-function createTaskElement(taskText, taskId = 0, status="New", classStatus= "badge badge-primary status-task", currentTime = new Date()) {
+*/
+
+
+function createTaskElement(taskText, taskId = 0, status="New", classStatus= "badge badge-primary status-task", currentTime = (new Date().toLocaleDateString())) {
   let projectTask = document.createElement("div");
   let titleTask = document.createElement("span");
   let controlContainer = document.createElement("div");
@@ -63,8 +67,7 @@ function createTaskElement(taskText, taskId = 0, status="New", classStatus= "bad
   let deletebutton = document.createElement("div");
   let label = document.createElement("div");
   let timechange = document.createElement("small");
-
-  let time = currentTime;
+  
   if(taskId === 0){
     taskId = Date.now();
    
@@ -72,12 +75,13 @@ function createTaskElement(taskText, taskId = 0, status="New", classStatus= "bad
       taskId: taskId,
       text: taskText,
       status: status,
-      time: time,
+      time: currentTime,
       classLabel: classStatus
     });
     localStorage.setItem('task', JSON.stringify(listTasks));
   }
 
+  // set atributes thẻ html 
   projectTask.className = "project-task";
   titleTask.className = "task-title";
   controlContainer.className = "control-container";
@@ -91,7 +95,7 @@ function createTaskElement(taskText, taskId = 0, status="New", classStatus= "bad
   editbutton.innerHTML = "edit";
   deletebutton.innerHTML = "delete";
   titleTask.innerHTML = taskText;
-  timechange.innerHTML = time.toLocaleString();
+  timechange.innerHTML = currentTime;
   projectTask.setAttribute("task_id", taskId);
 
   projectTask.appendChild(titleTask);
@@ -103,6 +107,15 @@ function createTaskElement(taskText, taskId = 0, status="New", classStatus= "bad
 
   return projectTask;
 }
+
+
+/*
+ Hàm init này hiện thị danh sách task theo trang thái task 
+ new thì append todo task 
+ in process thì append doing task
+ done thì append done task
+ đồng thời add class tương ứng với status của task 
+* */
 
 let initTask = function(){
   $.each(listTasks, function (_, value) {
@@ -125,28 +138,18 @@ let initTask = function(){
         break;
       }
     }
-    localStorage.setItem("task", JSON.stringify(listTasks));
   });
 }
 
 initTask();
 delete_task();
 edit_task();
-no_submit();
 
-function allowDrop(ev) {
-  ev.preventDefault();
-}
-
-function drag(ev) {
-  ev.dataTransfer.setData("text", ev.target.id);
-}
-
-function drop(ev) {
-  ev.preventDefault();
-  let data = ev.dataTransfer.getData("text");
-  ev.target.appendChild(document.getElementById(data));
-}
+/**
+ *  Kiểm tra input nếu đúng là null or space thì alert và return false
+ *  Nếu input validate thì gọi function create element và append html
+ *  set value = "" cho input 
+ */
 
 $("#myModal").on("click", "#submit", function(e){
 
@@ -166,6 +169,12 @@ $("#myModal").on("click", "#submit", function(e){
   return true;
 })
 
+/*
+*  1. Bắt sự kiện click của button delete qua class 'delete-task'
+*  2. get task id 
+*  3. dùng filter lọc task đó ra khỏi listTasks
+*  4. save lại listTask vào localStorage và remove element
+**/
 
 function delete_task() {
   $(".delete-task").click(function() {
@@ -192,6 +201,16 @@ function submit_update( parent_element, index_edit, edit_display, delete_display
   });
 }
 
+
+/*
+* 1. Bặt sự kiện click vào button edit chúng ta sẽ lấy được task_id của task hiện tại
+* 2. từ task_id ta truy cập listTask ==> index của task dk lữu trong listTasks --> update content lại localstorage
+* 3. Ta tạo input và button submit (add class, append vào html )
+* 4. Lấy giá trị hiện tại của task đổ lại vào thẻ input
+* 5. khi click vào edit thì ẩn  button delete và  hiển thị button submit . sau khi submit thì hiện thụ lại button  và edit.
+*/
+
+
 function edit_task() {
   $('.edit-task').click(function() {
     $('.submit-edit').remove();
@@ -216,18 +235,4 @@ function edit_task() {
     this.style.display = "none";
     submit_update(parentElementEdit, index_edit, edit_display, delete_display);
   });
-  no_submit();
-}
-
-function no_submit() {
-  $(document).on( "focusout",".edit-text", function() {
-    this.parentElement.children[2].children[0].style.display = 'inline-block';
-    this.parentElement.children[2].children[1].style.display = 'inline-block';
-    this.parentElement.children[2].children[2].remove();
-  });
-  // $(".edit-text").mouseout(function(){
-  //   this.parentElement.children[2].children[0].style.display = 'inline-block';
-  //   this.parentElement.children[2].children[1].style.display = 'inline-block';
-  //   this.parentElement.children[2].children[2].remove();
-  // });
 }
