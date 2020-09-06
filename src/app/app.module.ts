@@ -15,16 +15,15 @@ import { AppRoutingModule } from './app-routing.module';
     HeroesComponent,
     HeroDetailComponent,
     DashboardComponent,
-    MessagesComponent
+    MessagesComponent,
   ],
   imports: [
     BrowserModule,
     CommonModule,
-    RouterModule.forRoot(routes)
+    AppRoutingModule
+
   ],
-  exports: [
-    RouterModule
-  ],
+ 
   providers: [],
   bootstrap: [AppComponent]
 })
