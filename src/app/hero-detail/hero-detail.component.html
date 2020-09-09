@@ -2,5 +2,12 @@
 <div *ngIf="hero">
     <h2>{{hero.name | uppercase}} Details</h2>
     <div><span>id: </span>{{hero.id}}</div>
-    <button (click)="getBack()">back</button>
+    <div>
+        <lanel>
+            name:
+            <input [(ngModel)]="hero.name" placeholder="name" >
+        </lanel>
+    </div>
+    <button (click)="save()" class="btn btn-outline-info btn-sm" >Save</button>
+    <button (click)="goBack()" class="btn btn-info btn-sm" >back</button>
 </div>

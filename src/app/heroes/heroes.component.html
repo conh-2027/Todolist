@@ -4,5 +4,13 @@
         <a routerLink="/detail/{{hero.id}}">
             <span class="badge">{{hero.id}}</span> {{hero.name}}
         </a>
+        <button (click)="delete(hero)" class="delete">x</button>
     </li>
 </ul>
+<div>
+    <label >
+        name:
+        <input #heroName class="from-control">
+    </label>
+    <button (click)="add(heroName.value); heroName.value=''" class="btn btn-outline-primary">add</button>
+</div>
