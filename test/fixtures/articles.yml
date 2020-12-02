@@ -1,0 +1,21 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  slug: MyString
+  title: MyString
+  description: MyString
+  body: MyString
+  favorited: false
+  favoritesCount: 1
+  user: one
+  tag_list: one
+
+two:
+  slug: MyString
+  title: MyString
+  description: MyString
+  body: MyString
+  favorited: false
+  favoritesCount: 1
+  user: two
+  tag_list: two
