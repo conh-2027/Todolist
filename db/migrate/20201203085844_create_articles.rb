@@ -8,7 +8,7 @@ class CreateArticles < ActiveRecord::Migration[5.2]
       t.boolean :favorited
       t.integer :favoritesCount
       t.references :user, foreign_key: true
-      t.references :tag_list, foreign_key: true
+      t.references :tag, foreign_key: true
 
       t.timestamps
     end

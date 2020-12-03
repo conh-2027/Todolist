@@ -8,7 +8,7 @@ one:
   favorited: false
   favoritesCount: 1
   user: one
-  tag_list: one
+  tag: one
 
 two:
   slug: MyString
@@ -18,4 +18,4 @@ two:
   favorited: false
   favoritesCount: 1
   user: two
-  tag_list: two
+  tag: two
